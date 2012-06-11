@@ -31,7 +31,7 @@ module Keen
 
         batch_size = Keen::Async::BATCH_SIZE
 
-        num_batches = queue_length / batch_size
+        num_batches = 1 + queue_length / batch_size
 
         num_batches.times do
           collated = @handler.get_collated_jobs(batch_size)
