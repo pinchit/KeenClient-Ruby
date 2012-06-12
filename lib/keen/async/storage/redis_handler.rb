@@ -12,7 +12,7 @@ module Keen
         # ----
 
         def global_key_prefix
-          "keen_415" + Keen::VERSION
+          "keen"
         end
         
         def active_queue_key
@@ -108,9 +108,15 @@ module Keen
 
           jobs = []
 
+          #puts "doing the job #{how_many} times"
+
           how_many.times do
             this = @redis.lpop key
-            jobs.push JSON.parse this
+            if this
+              jobs.push JSON.parse this
+            else
+              #puts "couldn't process value #{this}"
+            end
           end
 
           collate_jobs(jobs)
