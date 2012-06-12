@@ -25,7 +25,9 @@ module Keen
 
         def add_to_active_queue(value)
           @redis.lpush active_queue_key, value
-          puts "added #{value} to active queue; length is now #{@redis.llen active_queue_key}"
+          if @logging
+            puts "added #{value} to active queue; length is now #{@redis.llen active_queue_key}"
+          end
         end
 
         def record_job(job)
@@ -36,8 +38,9 @@ module Keen
           # TODO consume the failed_queue and do something with it (loggly? retry? flat file?)
         end
 
-        def initialize
+        def initialize(logging = false)
           @redis = Redis.new
+          @logging = logging
         end
         
         def redis=(connection)
