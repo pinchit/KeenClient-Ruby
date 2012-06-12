@@ -40,7 +40,7 @@ module Keen
           end
         end
 
-        puts "Worker sent #{num_batches} batches of #{batch_size} events per batch."
+        return "Worker sent #{num_batches} batches of #{batch_size} events per batch."
       end
       
       def send_batch(project_id, batch)
