@@ -31,7 +31,7 @@ module Keen
 
         # define some key lists:
         required_keys = [:project_id, :auth_token, :collection_name, :event_body]
-        optional_keys = []
+        optional_keys = [:keen_client_version]
         all_keys = required_keys + optional_keys
 
 
@@ -52,6 +52,10 @@ module Keen
         all_keys.each do |key|
           value = definition[key]
           self.instance_variable_set("@#{key}", value)
+        end
+
+        unless definition.has_key? :keen_client_version
+          definition[:keen_client_version] = Keen::VERSION
         end
 
         @definition = definition
