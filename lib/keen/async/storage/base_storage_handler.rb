@@ -6,19 +6,24 @@ module Keen
     module Storage
       class BaseStorageHandler
 
-        # Keys
+        def initialize(client)
+          @logging = client.options[:logging]
+          @client = client
+        end
+
+        # Key stuff
         # ----
 
         def global_key_prefix
-          "keen"
+          "keen.#{@client.options[:storage_namespace]}"
         end
         
         def active_queue_key
-          "#{global_key_prefix}.active_queue_key"
+          "#{global_key_prefix}.active_queue"
         end
 
         def failed_queue_key
-          "#{global_key_prefix}.failed_queue_key"
+          "#{global_key_prefix}.failed_queue"
         end
 
         def add_to_active_queue(value)
@@ -36,12 +41,8 @@ module Keen
           # TODO consume the failed_queue and do something with it (loggly? retry? flat file?)
         end
 
-        def redis=(connection)
-          @redis = connection
-        end
-
         def count_active_queue
-          @redis.llen active_queue_key
+          raise NotImplementedError
         end
 
         def get_collated_jobs(how_many)
@@ -95,24 +96,8 @@ module Keen
           #    }
           #  }
 
-          handle_prior_failures
+          raise NotImplementedError
 
-          key = active_queue_key
-
-          jobs = []
-
-          #puts "doing the job #{how_many} times"
-
-          how_many.times do
-            this = @redis.lpop key
-            if this
-              jobs.push JSON.parse this
-            else
-              #puts "couldn't process value #{this}"
-            end
-          end
-
-          collate_jobs(jobs)
         end
 
         def collate_jobs(queue)

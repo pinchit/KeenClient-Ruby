@@ -1,15 +1,23 @@
-require "keen/async/storage/redis_handler"
-require "keen/async/job"
 require "json"
 require "uri"
 require "time"
+require "net/http"
+require "net/https"
 
 
 module Keen
 
   class Client
 
-    attr_accessor :storage_handler, :project_id, :auth_token
+    attr_accessor :storage_handler, :project_id, :auth_token, :options
+
+    def base_url
+      if @options[:base_url]
+        @options[:base_url]
+      else
+        "https://api.keen.io/2.0"
+      end
+    end
 
     def initialize(project_id, auth_token, options = {})
 
@@ -17,20 +25,39 @@ module Keen
       raise "auth_token must be string" unless auth_token.kind_of? String
 
       default_options = {
-        :storage_mode => :redis,
+        :logging => true,
+        
+        # warning! not caching locally leads to bad performance:
+        :cache_locally => true, 
+
+        # this is required if cache_locally is true:
+        :storage_class => nil, 
+
+        # all keys will be prepended with this:
+        :storage_namespace => "default",
       }
-      
+
       options = default_options.update(options)
 
       @project_id = project_id
       @auth_token = auth_token
-      @storage_mode = options[:storage_mode]
+      @cache_locally = options[:cache_locally]
+
+      if @cache_locally
+        @storage_class = options[:storage_class]
+        unless @storage_class and @storage_class < Keen::Async::Storage::BaseStorageHandler
+          raise "The Storage Class you send must extend BaseStorageHandler.  You sent: #{@storage_class}"
+        end
+      end
+
+      @logging = options[:logging]
+      @options = options
+
     end
 
-    def handler
-
+    def storage_handler
       unless @storage_handler
-        @storage_handler = self.class.create_new_storage_handler(@storage_mode)
+        @storage_handler = @storage_class.new(self)
       end
 
       @storage_handler
@@ -44,33 +71,92 @@ module Keen
       #
       # `timestamp` is optional. If sent, it should be a Time instance.  
       #  If it's not sent, we'll use the current time.
-
+      
       validate_collection_name(collection_name)
 
       unless timestamp
         timestamp = Time.now
       end
 
-      event_body[:_timestamp] = timestamp.utc.iso8601
+      timestamp = timestamp.utc.iso8601
 
-      job = Keen::Async::Job.new(handler, {
-        :project_id => @project_id,
-        :auth_token => @auth_token,
-        :collection_name => collection_name,
-        :event_body => event_body,
-      })
+      event = Keen::Event.new(timestamp, collection_name, event_body)
 
-      job.save
+      if @cache_locally
+        job = Keen::Async::Job.new(storage_handler, {
+          :timestamp => event.timestamp,
+          :project_id => @project_id,
+          :auth_token => @auth_token,
+          :collection_name => collection_name,
+          :event_body => event.body,
+        })
+
+        job.save
+      else
+        # build the request:
+        url = "#{base_url}/projects/#{project_id}/#{collection_name}"
+        uri = URI.parse(url)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        http.ca_file = Keen::Async::SSL_CA_FILE
+        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        http.verify_depth = 5
+
+        request = Net::HTTP::Post.new(uri.path)
+        request.body = JSON.generate({
+          :header => {
+            :timestamp => event.timestamp,
+          },
+          :body => event.body
+        })
+
+        request["Content-Type"] = "application/json"
+        request["Authorization"] = @auth_token
+
+        response = http.request(request)
+        JSON.parse response.body
+      end
+    end
+
+    def send_batch(events)
+      # make the request body:
+      event_list = []
+      events.each { |event| 
+        header = {"timestamp" => event.timestamp}
+        body = event.body
+        item = {"header" => header, "body" => body}
+        event_list.push(item)
+      }
+      request_body = event_list.to_json
+    
+      # build the request:
+      url = "#{base_url}/projects/#{project_id}/_events"
+      uri = URI.parse(url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.ca_file = Keen::Async::SSL_CA_FILE
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      http.verify_depth = 5
+
+      request = Net::HTTP::Post.new(uri.path)
+      request.body = request_body
+      request["Content-Type"] = "application/json"
+      request["Authorization"] = auth_token
+
+
+      http.request(request)
     end
 
     def validate_collection_name(collection_name)
       # TODO
     end
 
-    def self.create_new_storage_handler(storage_mode)
+    def self.create_new_storage_handler(storage_mode, client, logging)
+      # This is shitty as hell.  We shoudl take in a class reference pointing to the storage handler, not switch on string values
       case storage_mode.to_sym
+
       when :redis
-        Keen::Async::Storage::RedisHandler.new
+        Keen::Async::Storage::RedisHandler.new(client, logging)
       else
         raise "Unknown storage_mode sent to client: `#{storage_mode}`"
       end
