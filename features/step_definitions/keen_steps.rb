@@ -10,6 +10,8 @@ Given /^a Keen Client using Redis$/ do
                              :storage_namespace => "test",
                              :logging => false )
 
+  @client.storage_handler.clear_active_queue
+
   @starting_queue_size = @client.storage_handler.count_active_queue
 end
 
@@ -21,14 +23,41 @@ Given /^a Keen Client using Direct$/ do
 end
 
 When /^I post an event$/ do
-  @result = @client.add_event("cucumber_events", {:hi_from => :cucumber, :keen_version => Keen::VERSION})
+  @result = @client.add_event("cucumber_events", {:hi_from => "cucumber!", :keen_version => Keen::VERSION})
 end
 
-Then /^the size of the Redis queue should have gone up by one\.$/ do
-  @client.storage_handler.count_active_queue.should == 1 + @starting_queue_size
+Then /^the size of the Redis queue should have gone up by (\d+)\.$/ do |n|
+  @client.storage_handler.count_active_queue.should == n.to_i + @starting_queue_size
 end
 
 Then /^the response from the server should be good\.$/ do
   response = @result
   response.should == {"created" => true}
+end
+
+
+When /^I post (\d+) events$/ do |n|
+  n.to_i.times do
+    @client.add_event("cucumber_events", {:hi_from => "cucumber!", :keen_version => Keen::VERSION})
+  end
+end
+
+When /^I process the queue$/ do
+  worker = Keen::Async::Worker.new(@client)
+  @result = worker.process_queue
+end
+
+Then /^the response from Keen should be (\d+) happy smiles$/ do |n|
+  expectation = []
+  n.to_i.times do
+    expectation.push({"created" => true})
+  end
+
+  response = @result
+  puts response.body
+  response.should == expectation
+end
+
+Then /^the queue should be empty\.$/ do
+  pending # express the regexp above with the code you wish you had
 end

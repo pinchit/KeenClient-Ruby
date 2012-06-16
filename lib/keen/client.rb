@@ -128,6 +128,7 @@ module Keen
         event_list.push(item)
       }
       request_body = event_list.to_json
+
     
       # build the request:
       url = "#{base_url}/projects/#{project_id}/_events"
@@ -143,6 +144,8 @@ module Keen
       request["Content-Type"] = "application/json"
       request["Authorization"] = auth_token
 
+      puts "request body is #{request_body}"
+      puts "url is #{url}"
 
       http.request(request)
     end

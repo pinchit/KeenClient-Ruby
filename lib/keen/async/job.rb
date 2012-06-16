@@ -7,7 +7,7 @@ module Keen
       #
       #
 
-      attr_accessor :project_id, :auth_token, :collection_name, :event_body
+      attr_accessor :project_id, :auth_token, :collection_name, :event_body, :timestamp
       
       def to_json(options=nil)
         @definition.to_json
@@ -18,7 +18,7 @@ module Keen
         self.to_json
       end
       
-      def initialize(handler, definition={})
+      def initialize(handler, definition)
         # The `definition` can come from redis, a flat file, or code.
         load_definition(definition)
         @handler = handler
@@ -45,7 +45,7 @@ module Keen
         required_keys.each do |key|
           
           unless definition.has_key? key
-            raise "You failed to send: #{key}"
+            raise "You failed to send: #{key} -- you sent #{JSON.generate definition}"
           end
 
           value = definition[key]

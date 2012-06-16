@@ -12,6 +12,7 @@ module Keen
     class Worker
 
       def initialize(client)
+        @client = client
         @storage_handler = client.storage_handler
       end
 
@@ -27,29 +28,19 @@ module Keen
 
         batch_size = Keen::Async::BATCH_SIZE
 
-        num_batches = 1 + queue_length / batch_size
+        job_definitions = @storage_handler.get_authorized_jobs(batch_size, @client)
 
-        num_batches.times do
-          collated = @storage_handler.get_collated_jobs(batch_size)
-          collated.each do |project_id, batch|
-            send_batch(project_id, batch)
-          end
+        events = []
+
+        job_definitions.each do |job_definition|
+          #puts JSON.generate job_definition
+          job = Keen::Async::Job.new(@client, job_definition)
+          events.push Keen::Event.new(job.timestamp, job.collection_name, job.event_body)
         end
 
-        return "Worker sent #{num_batches} batches of #{batch_size} events per batch."
-      end
 
-      def send_batch(project_id, batch)
-        if not batch
-          return
-        end
+        @client.send_batch(events)
 
-        auth_token = job_list[0].auth_token
-
-        # TODO: If something fails, we should move the job to the 
-        # prior_failures queue by calling, perhaps:
-        #
-        # @handler.log_failed_job(job)
       end
 
     end

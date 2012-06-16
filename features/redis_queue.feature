@@ -14,10 +14,10 @@ Feature: RedisHandler
     Examples:
       |n    | 
       |1    | 
-      |100  | 
-      |99   | 
-      |1000 | 
-      |999  | 
+      #|100  | 
+      #|99   | 
+      #|1000 | 
+      #|999  | 
 
   Scenario Outline: Add Events to Redis queue
     Given a Keen Client using Redis

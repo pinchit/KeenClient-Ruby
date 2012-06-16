@@ -30,26 +30,54 @@ module Keen
           redis.llen active_queue_key
         end
 
-        def get_collated_jobs(how_many)
+        def clear_active_queue
+          redis.del active_queue_key
+        end
+
+        def get_authorized_jobs(how_many, client)
 
           handle_prior_failures
 
           key = active_queue_key
 
-          jobs = []
+          job_definitions = []
+          skipped_job_definitions = []
 
           #puts "doing the job #{how_many} times"
 
-          how_many.times do
+          while true do
             this = redis.lpop key
-            if this
-              jobs.push JSON.parse this
-            else
-              #puts "couldn't process value #{this}"
+
+            # If we're out of jobs, end the loop:
+            if not this
+              break
             end
+            
+            # Parse the JSON into a job definition
+            job_definition = JSON.parse this
+
+            # Make sure this client is authorized to process this job:
+            unless job_definition[:project_id] == client.project_id
+              unless job_definition[:auth_token] == client.auth_token
+                # We're not authorized, so skip this job.
+                skipped_job_definitions.push job_definition
+                next
+              end
+            end
+
+            job_definitions.push job_definition
+
+            if jobs.length == how_many
+              break
+            end
+
           end
 
-          collate_jobs(jobs)
+          # Put the skipped jobs back on the queue.
+          skipped_job_definitions.each do |job_definition|
+            redis.lpush key, job_definition
+          end
+
         end
 
       end
