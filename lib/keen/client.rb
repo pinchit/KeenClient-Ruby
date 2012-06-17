@@ -120,15 +120,18 @@ module Keen
 
     def send_batch(events)
       # make the request body:
-      event_list = []
+      request_body = {}
       events.each { |event| 
+        unless request_body.has_key? event.collection_name
+          request_body[event.collection_name] = []
+        end
+
         header = {"timestamp" => event.timestamp}
         body = event.body
         item = {"header" => header, "body" => body}
-        event_list.push(item)
+        request_body[event.collection_name].push(item)
       }
-      request_body = event_list.to_json
-
+      request_body = request_body.to_json
     
       # build the request:
       url = "#{base_url}/projects/#{project_id}/_events"
