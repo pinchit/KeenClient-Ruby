@@ -22,9 +22,9 @@ Gem::Specification.new do |s|
   # s.add_development_dependency "rspec"
   # s.add_runtime_dependency "rest-client"
   
-  s.add_dependency('json', '>= 1.6.5')
-  s.add_dependency('rspec', '>= 2.9.0')
-  s.add_dependency('cucumber', '>= 1.2.1')
+  s.add_dependency("json", ">= 1.6.5")
+  s.add_development_dependency("rspec", ">= 2.9.0")
+  s.add_development_dependency("cucumber", ">= 1.2.1")
 
   # This is no longer necessary, since we support several storage modes now:
   # s.add_dependency('redis', '>= 2.2.2')
