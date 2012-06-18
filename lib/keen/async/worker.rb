@@ -28,18 +28,28 @@ module Keen
 
         batch_size = Keen::Async::BATCH_SIZE
 
-        job_definitions = @storage_handler.get_authorized_jobs(batch_size, @client)
 
         events = []
 
-        job_definitions.each do |job_definition|
-          #puts JSON.generate job_definition
-          job = Keen::Async::Job.new(@client, job_definition)
-          events.push Keen::Event.new(job.timestamp, job.collection_name, job.event_body)
+
+        responses = []
+
+        num_batches = queue_length / batch_size + 1
+        num_batches.times do
+
+          job_definitions = @storage_handler.get_authorized_jobs(batch_size, @client)
+
+          job_definitions.each do |job_definition|
+            #puts JSON.generate job_definition
+            job = Keen::Async::Job.new(@client, job_definition)
+            events.push Keen::Event.new(job.timestamp, job.collection_name, job.event_body)
+          end
+
+          responses.push @client.send_batch(events)
         end
 
 
-        @client.send_batch(events)
+        responses
 
       end
 

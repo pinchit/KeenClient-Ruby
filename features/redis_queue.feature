@@ -4,21 +4,6 @@ Feature: RedisHandler
   As a developer
   I want to be able to batch up events in Redis and send them to Keen all at once.
 
-  Scenario Outline: Send a bunch of events.
-    Given a Keen Client using Redis
-    When I post <n> events
-    And I process the queue
-    Then the response from Keen should be <n> happy smiles
-    And the queue should be empty.
-
-    Examples:
-      |n    | 
-      |1    | 
-      #|100  | 
-      #|99   | 
-      #|1000 | 
-      #|999  | 
-
   Scenario Outline: Add Events to Redis queue
     Given a Keen Client using Redis
     When I post <n> events
@@ -31,3 +16,19 @@ Feature: RedisHandler
       |99   | 
       |1000 | 
       |999  | 
+
+  Scenario Outline: Batch a bunch of events in the Redis queue, then send them.
+    Given a Keen Client using Redis
+    When I post <n> events
+    And I process the queue
+    Then the response from Keen should be <n> happy smiles
+    And the queue should be empty.
+
+    Examples:
+      |n    | 
+      |1    | 
+      |100  | 
+      |99   | 
+      |1000 | 
+      |999  | 
+

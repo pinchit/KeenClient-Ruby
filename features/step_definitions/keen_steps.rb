@@ -50,14 +50,12 @@ end
 Then /^the response from Keen should be (\d+) happy smiles$/ do |n|
   expectation = []
   n.to_i.times do
-    expectation.push({"created" => true})
+    expectation.push({"success" => true})
   end
 
-  response = @result
-  puts response.body
-  response.should == expectation
+  expectation = {"cucumber_events" => expectation}
 end
 
 Then /^the queue should be empty\.$/ do
-  pending # express the regexp above with the code you wish you had
+  @client.storage_handler.count_active_queue.should == 0
 end

@@ -147,10 +147,10 @@ module Keen
       request["Content-Type"] = "application/json"
       request["Authorization"] = auth_token
 
-      puts "request body is #{request_body}"
-      puts "url is #{url}"
+      resp = http.request(request)
 
-      http.request(request)
+      return JSON.parse resp.body
+
     end
 
     def validate_collection_name(collection_name)

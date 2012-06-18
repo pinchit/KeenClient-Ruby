@@ -55,6 +55,7 @@ module Keen
             
             # Parse the JSON into a job definition
             job_definition = JSON.parse this
+            job_definition = Keen::Utils.symbolize_keys(job_definition)
 
             # Make sure this client is authorized to process this job:
             unless job_definition[:project_id] == client.project_id
@@ -67,7 +68,7 @@ module Keen
 
             job_definitions.push job_definition
 
-            if jobs.length == how_many
+            if job_definitions.length == how_many
               break
             end
 
