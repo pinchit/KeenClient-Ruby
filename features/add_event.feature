@@ -5,6 +5,6 @@ Feature: AddEvent
   I want to be able to post an event to the Keen Client as a Hash/Dictionary
 
   Scenario: Send Event directly to Keen
-    Given a Keen Client using Direct
+    Given a Keen Client in Direct Send mode
     When I post an event
     Then the response from the server should be good.

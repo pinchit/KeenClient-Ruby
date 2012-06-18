@@ -15,7 +15,7 @@ Given /^a Keen Client using Redis$/ do
   @starting_queue_size = @client.storage_handler.count_active_queue
 end
 
-Given /^a Keen Client using Direct$/ do
+Given /^a Keen Client in Direct Send mode$/ do
   @client = Keen::Client.new(@project_id, 
                              @auth_token, 
                              :cache_locally => false,
