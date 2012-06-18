@@ -27,10 +27,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency("cucumber", ">= 1.2.1")
 
   # This is no longer necessary, since we support several storage modes now:
-  # s.add_dependency('redis', '>= 2.2.2')
-
-  if RUBY_VERSION < "1.9"
-    s.add_dependency('system_timer', '>= 1.2.4')
-  end
+  # s.add_dependency("redis", ">= 2.2.2")
 
 end
