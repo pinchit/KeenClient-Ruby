@@ -8,6 +8,7 @@ Given /^a Keen Client using Redis$/ do
                              @auth_token, 
                              :storage_class => Keen::Async::Storage::RedisHandler,
                              :storage_namespace => "test",
+                             :cache_locally => true,
                              :logging => false )
 
   @client.storage_handler.clear_active_queue
