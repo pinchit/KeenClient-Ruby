@@ -27,8 +27,8 @@ module Keen
       default_options = {
         :logging => true,
         
-        # warning! not caching locally leads to bad performance:
-        :cache_locally => true, 
+        # should we cache events locally somewhere?  if false, sends directly to Keen
+        :cache_locally => false, 
 
         # this is required if cache_locally is true:
         :storage_class => nil, 
