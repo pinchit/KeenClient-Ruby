@@ -4,16 +4,16 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = "keen"
-  s.version = "0.1.6"
+  s.name = %q{keen}
+  s.version = "0.1.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["dorkitude"]
-  s.date = "2012-06-19"
-  s.description = "See the github repo or examples.rb for usage information."
-  s.email = "kyle@keen.io"
+  s.date = %q{2012-06-19}
+  s.default_executable = %q{keen_send}
+  s.description = %q{See the github repo or examples.rb for usage information.}
+  s.email = %q{kyle@keen.io}
   s.executables = ["keen_send"]
-  s.extensions = ["ext/mkrf_conf.rb"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"
@@ -28,7 +28,6 @@ Gem::Specification.new do |s|
     "bin/keen_send",
     "conf/cacert.pem",
     "examples.rb",
-    "ext/mkrf_conf.rb",
     "features/add_event.feature",
     "features/redis_queue.feature",
     "features/step_definitions/keen_steps.rb",
@@ -50,11 +49,11 @@ Gem::Specification.new do |s|
     "lib/keen/version.rb",
     "send.rb"
   ]
-  s.homepage = "http://github.com/dorkitude/keen"
+  s.homepage = %q{http://github.com/dorkitude/keen}
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.19"
-  s.summary = "A library for batching and sending arbitrary events to the Keen API at http://keen.io"
+  s.rubygems_version = %q{1.4.2}
+  s.summary = %q{A library for batching and sending arbitrary events to the Keen API at http://keen.io}
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
