@@ -5,15 +5,13 @@
 
 Gem::Specification.new do |s|
   s.name = %q{keen}
-  s.version = "0.1.9"
+  s.version = "0.1.10"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["dorkitude"]
   s.date = %q{2012-06-19}
-  s.default_executable = %q{keen_send}
   s.description = %q{See the github repo or examples.rb for usage information.}
   s.email = %q{kyle@keen.io}
-  s.executables = ["keen_send"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.md"
@@ -25,7 +23,6 @@ Gem::Specification.new do |s|
     "README.md",
     "Rakefile",
     "VERSION.yml",
-    "bin/keen_send",
     "conf/cacert.pem",
     "examples.rb",
     "features/add_event.feature",
