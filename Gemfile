@@ -13,7 +13,3 @@ group :development do
   gem "rspec", ">= 2.9.0"
   gem "cucumber", ">= 1.2.1"
 end
-
-if RUBY_VERSION =~ /^1\.8/
-  gem "system_timer"
-end
