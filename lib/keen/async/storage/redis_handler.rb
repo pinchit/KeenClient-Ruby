@@ -79,6 +79,8 @@ module Keen
             redis.lpush key, job_definition
           end
 
+          job_definitions
+
         end
 
       end
