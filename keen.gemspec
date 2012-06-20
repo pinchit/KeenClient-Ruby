@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{keen}
-  s.version = "0.1.10"
+  s.version = "0.1.11"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["dorkitude"]
-  s.date = %q{2012-06-19}
+  s.date = %q{2012-06-20}
   s.description = %q{See the github repo or examples.rb for usage information.}
   s.email = %q{kyle@keen.io}
   s.extra_rdoc_files = [
