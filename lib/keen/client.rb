@@ -9,7 +9,7 @@ module Keen
 
   class Client
 
-    attr_accessor :storage_handler, :project_id, :auth_token, :options
+    attr_accessor :storage_handler, :project_id, :auth_token, :options, :logging
 
     def base_url
       if @options[:base_url]
@@ -148,6 +148,10 @@ module Keen
       request["Authorization"] = auth_token
 
       resp = http.request(request)
+
+      if @logging
+        puts resp.body
+      end
 
       return JSON.parse resp.body
 

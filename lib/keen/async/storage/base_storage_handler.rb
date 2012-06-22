@@ -7,7 +7,7 @@ module Keen
       class BaseStorageHandler
 
         def initialize(client)
-          @logging = client.options[:logging]
+          @logging = client.logging
           @client = client
         end
 

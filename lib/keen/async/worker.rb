@@ -48,6 +48,9 @@ module Keen
           responses.push @client.send_batch(events)
         end
 
+        if @client.logging
+          puts responses
+        end
 
         responses
 
