@@ -1,12 +1,12 @@
 module Keen
   class Event
 
-    attr_accessor :timestamp, :collection_name, :body
+    attr_accessor :event_collection, :properties, :timestamp
 
-    def initialize(timestamp, collection_name, body)
+    def initialize(event_collection, properties, timestamp=nil)
+      @event_collection = event_collection
+      @properties = properties
       @timestamp = timestamp
-      @collection_name = collection_name
-      @body = body
     end
 
   end

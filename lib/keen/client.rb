@@ -15,7 +15,7 @@ module Keen
       if @options[:base_url]
         @options[:base_url]
       else
-        "https://api.keen.io/2.0"
+        "https://api.keen.io/3.0"
       end
     end
 
@@ -44,6 +44,8 @@ module Keen
       @cache_locally = options[:cache_locally]
 
       if @cache_locally
+        raise "Local caching not supported in this version."
+
         @storage_class = options[:storage_class]
         unless @storage_class and @storage_class < Keen::Async::Storage::BaseStorageHandler
           raise "The Storage Class you send must extend BaseStorageHandler.  You sent: #{@storage_class}"
@@ -63,73 +65,64 @@ module Keen
       @storage_handler
     end
 
-    def add_event(collection_name, event_body, timestamp=nil)
+    def add_event(event_collection, event_properties, timestamp=nil)
       #
-      # `collection_name` should be a string
+      # `event_collection` should be a string
       #
-      # `event_body` should be a JSON-serializable hash
+      # `event` should be a JSON-serializable hash
       #
       # `timestamp` is optional. If sent, it should be a Time instance.  
       #  If it's not sent, we'll use the current time.
       
-      validate_collection_name(collection_name)
+      validate_event_collection(event_collection)
 
-      unless timestamp
-        timestamp = Time.now
+      if timestamp
+        timestamp = timestamp.utc.iso8601
       end
 
-      timestamp = timestamp.utc.iso8601
+      event = Keen::Event.new(event_collection, event_properties)
 
-      event = Keen::Event.new(timestamp, collection_name, event_body)
+      # build the request:
+      url = "#{base_url}/projects/#{project_id}/events/#{event_collection}"
+      uri = URI.parse(url)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.ca_file = Keen::Async::SSL_CA_FILE
+      http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+      http.verify_depth = 5
 
-      if @cache_locally
-        job = Keen::Async::Job.new(storage_handler, {
-          :timestamp => event.timestamp,
-          :project_id => @project_id,
-          :auth_token => @auth_token,
-          :collection_name => collection_name,
-          :event_body => event.body,
-        })
+      request = Net::HTTP::Post.new(uri.path)
 
-        job.save
-      else
-        # build the request:
-        url = "#{base_url}/projects/#{project_id}/#{collection_name}"
-        uri = URI.parse(url)
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.use_ssl = true
-        http.ca_file = Keen::Async::SSL_CA_FILE
-        http.verify_mode = OpenSSL::SSL::VERIFY_PEER
-        http.verify_depth = 5
+      body = event.properties
 
-        request = Net::HTTP::Post.new(uri.path)
-        request.body = JSON.generate({
-          :header => {
-            :timestamp => event.timestamp,
-          },
-          :body => event.body
-        })
-
-        request["Content-Type"] = "application/json"
-        request["Authorization"] = @auth_token
-
-        response = http.request(request)
-        JSON.parse response.body
+      if timestamp
+        request.body[:keen] = {
+          :timestamp => timestamp
+        }
       end
+
+      request.body = JSON.generate(body)
+
+      request["Content-Type"] = "application/json"
+      request["Authorization"] = @auth_token
+
+      response = http.request(request)
+      JSON.parse response.body
+
     end
 
     def send_batch(events)
       # make the request body:
       request_body = {}
       events.each { |event| 
-        unless request_body.has_key? event.collection_name
-          request_body[event.collection_name] = []
+        unless request_body.has_key? event.event_collection
+          request_body[event.event_collection] = []
         end
 
         header = {"timestamp" => event.timestamp}
         body = event.body
         item = {"header" => header, "body" => body}
-        request_body[event.collection_name].push(item)
+        request_body[event.event_collection].push(item)
       }
       request_body = request_body.to_json
     
@@ -154,10 +147,9 @@ module Keen
       end
 
       return JSON.parse resp.body
-
     end
 
-    def validate_collection_name(collection_name)
+    def validate_event_collection(event_collection)
       # TODO
     end
 
