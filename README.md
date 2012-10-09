@@ -6,7 +6,10 @@ Usage
 
 `gem install keen`
 
-(docs are on the way -- for now, see the Cucumber and Rspec stuff in /features/ for usage details)
+Ruby Client Usage Guide
+http://keen.io/static/docs/clients/ruby/usage_guide.html
+
+see Also the Cucumber and Rspec stuff in /features/ for usage details)
 
 Contributing to keen
 --------------------
