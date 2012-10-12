@@ -15,6 +15,8 @@ Contributing to keen
 --------------------
  
  * Use Jeweler!
+   * rake version:bump:major
+   * rake release
  * Make sure all tests pass in 1.9.2 and 1.9.3
  * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet.
  * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it.
