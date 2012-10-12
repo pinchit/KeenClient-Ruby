@@ -1,12 +1,5 @@
 Gemfile.lock
 
-# rails example stuff:
-examples/rails_2/CoolForums/db/*.sqlite3
-examples/rails_2/CoolForums/doc/api
-examples/rails_2/CoolForums/doc/app
-examples/rails_2/CoolForums/log/*.log
-examples/rails_2/CoolForums/tmp/**/*
-
 # rdoc generated
 rdoc
 
