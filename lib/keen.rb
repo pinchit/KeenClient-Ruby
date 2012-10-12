@@ -1,4 +1,3 @@
-require 'keen/async'
 require 'keen/client'
 require 'keen/event'
 require 'keen/keys'

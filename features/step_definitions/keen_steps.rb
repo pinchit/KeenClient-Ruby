@@ -6,7 +6,6 @@ require 'keen'
 Given /^a Keen Client in Direct Send mode$/ do
   @client = Keen::Client.new(@project_id, 
                              @api_key, 
-                             :cache_locally => false,
                              :logging => false )
 end
 
