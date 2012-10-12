@@ -59,7 +59,7 @@ module Keen
 
             # Make sure this client is authorized to process this job:
             unless job_definition[:project_id] == client.project_id
-              unless job_definition[:auth_token] == client.auth_token
+              unless job_definition[:api_key] == client.api_key
                 # We're not authorized, so skip this job.
                 skipped_job_definitions.push job_definition
                 next

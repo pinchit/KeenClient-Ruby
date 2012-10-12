@@ -9,7 +9,7 @@ module Keen
 
   class Client
 
-    attr_accessor :storage_handler, :project_id, :auth_token, :options, :logging
+    attr_accessor :storage_handler, :project_id, :api_key, :options, :logging
 
     def base_url
       if @options[:base_url]
@@ -19,10 +19,10 @@ module Keen
       end
     end
 
-    def initialize(project_id, auth_token, options = {})
+    def initialize(project_id, api_key, options = {})
 
       raise "project_id must be string" unless project_id.kind_of? String
-      raise "auth_token must be string" unless auth_token.kind_of? String
+      raise "api_key must be string" unless api_key.kind_of? String
 
       default_options = {
         :logging => true,
@@ -40,7 +40,7 @@ module Keen
       options = default_options.update(options)
 
       @project_id = project_id
-      @auth_token = auth_token
+      @api_key = api_key
       @cache_locally = options[:cache_locally]
 
       if @cache_locally
@@ -104,7 +104,7 @@ module Keen
       request.body = JSON.generate(body)
 
       request["Content-Type"] = "application/json"
-      request["Authorization"] = @auth_token
+      request["Authorization"] = @api_key
 
       response = http.request(request)
       JSON.parse response.body
@@ -138,7 +138,7 @@ module Keen
       request = Net::HTTP::Post.new(uri.path)
       request.body = request_body
       request["Content-Type"] = "application/json"
-      request["Authorization"] = auth_token
+      request["Authorization"] = api_key
 
       resp = http.request(request)
 

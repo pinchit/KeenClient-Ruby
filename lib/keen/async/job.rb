@@ -7,7 +7,7 @@ module Keen
       #
       #
 
-      attr_accessor :project_id, :auth_token, :collection_name, :event_body, :timestamp
+      attr_accessor :project_id, :api_key, :collection_name, :event_body, :timestamp
       
       def to_json(options=nil)
         @definition.to_json
@@ -30,7 +30,7 @@ module Keen
         definition = Keen::Utils.symbolize_keys(definition)
 
         # define some key lists:
-        required_keys = [:timestamp, :project_id, :auth_token, :collection_name, :event_body]
+        required_keys = [:timestamp, :project_id, :api_key, :collection_name, :event_body]
         optional_keys = [:keen_client_version]
         all_keys = required_keys + optional_keys
 

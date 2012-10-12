@@ -5,7 +5,7 @@ require 'keen'
 
 Given /^a Keen Client using Redis$/ do
   @client = Keen::Client.new(@project_id, 
-                             @auth_token, 
+                             @api_key, 
                              :storage_class => Keen::Async::Storage::RedisHandler,
                              :storage_namespace => "test",
                              :cache_locally => true,
@@ -18,7 +18,7 @@ end
 
 Given /^a Keen Client in Direct Send mode$/ do
   @client = Keen::Client.new(@project_id, 
-                             @auth_token, 
+                             @api_key, 
                              :cache_locally => false,
                              :logging => false )
 end

@@ -3,10 +3,10 @@ require 'keen'
  
 # Get these from the keen.io website:
 project_id = 'asdfasldkfjalsdkfalskdfj'
-auth_token = 'asldfjklj325tkl32jaskdlfjaf'
+api_key = 'asldfjklj325tkl32jaskdlfjaf'
 
 # First you must setup the client:
-keen = Keen::Client.new(project_id, auth_token, :storage_mode => :redis)
+keen = Keen::Client.new(project_id, api_key, :storage_mode => :redis)
 
 # Then, you can use that client to send events.  
 
