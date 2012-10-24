@@ -18,7 +18,7 @@ module Keen
     end
 
     def ssl_cert_file
-      File.expand_path("../../conf/cacert.pem", __FILE__)
+      File.expand_path("../../../conf/cacert.pem", __FILE__)
     end
 
     def initialize(project_id, api_key, options = {})
