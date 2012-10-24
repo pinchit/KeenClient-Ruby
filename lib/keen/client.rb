@@ -6,11 +6,7 @@ require "net/https"
 
 
 module Keen
-
   class Client
-
-
-
     attr_accessor :project_id, :api_key, :options, :logging
 
     def base_url
@@ -21,12 +17,11 @@ module Keen
       end
     end
 
-    def ssl_cert_file 
-      File.dirname(__FILE__) + '../../conf/cacert.pem'
+    def ssl_cert_file
+      File.expand_path("../../../conf/cacert.pem", __FILE__)
     end
 
     def initialize(project_id, api_key, options = {})
-
       raise "project_id must be string" unless project_id.kind_of? String
       raise "api_key must be string" unless api_key.kind_of? String
 
@@ -41,7 +36,6 @@ module Keen
 
       @logging = options[:logging]
       @options = options
-
     end
 
     def add_event(event_collection, event_properties, timestamp=nil)
@@ -87,13 +81,10 @@ module Keen
 
       response = http.request(request)
       JSON.parse response.body
-
     end
 
     def validate_event_collection(event_collection)
       # TODO
     end
-
-
   end
 end
